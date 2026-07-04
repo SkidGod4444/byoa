@@ -5,7 +5,7 @@
 // engineering trade-offs so the UI can explain *why* a choice matters.
 // ---------------------------------------------------------------------------
 
-import type { MotorType, Stage, StageType } from "./types";
+import type { Motor, MotorType, Stage, StageType } from "./types";
 
 export interface StageTypeInfo {
   type: StageType;
@@ -260,6 +260,12 @@ export interface MotorTypeInfo {
   cons: string[];
   usedIn: string;
   color: string;
+  /**
+   * Typical real-world parameters for this motor family. Loaded when the user
+   * switches type, so the choice VISIBLY changes the machine's personality —
+   * a brushed toy motor, a robot-grade BLDC, and a stepper behave nothing alike.
+   */
+  defaults: Omit<Motor, "type" | "name">;
 }
 
 export const MOTOR_TYPES: Record<MotorType, MotorTypeInfo> = {
@@ -275,6 +281,17 @@ export const MOTOR_TYPES: Record<MotorType, MotorTypeInfo> = {
     cons: ["Brushes wear out", "Electrical noise/sparking", "Lower efficiency"],
     usedIn: "Toys, hobby robots, cheap gearmotors",
     color: "#f87171",
+    defaults: {
+      // a classic 380-size hobby motor: screams at ~14k rpm, almost no torque
+      voltage: 12,
+      kv: 1200,
+      resistance: 1.8,
+      noLoadCurrent: 0.2,
+      currentLimit: 5,
+      rotorInertia: 6,
+      mass: 120,
+      stepsPerRev: undefined,
+    },
   },
   bldc: {
     type: "bldc",
@@ -289,6 +306,17 @@ export const MOTOR_TYPES: Record<MotorType, MotorTypeInfo> = {
     cons: ["Needs electronic controller", "More complex", "Costlier"],
     usedIn: "Drones, EVs, legged robots, CNC spindles",
     color: "#60a5fa",
+    defaults: {
+      // a robot-grade outrunner: strong, efficient, controller-driven
+      voltage: 24,
+      kv: 190,
+      resistance: 0.15,
+      noLoadCurrent: 0.6,
+      currentLimit: 20,
+      rotorInertia: 30,
+      mass: 300,
+      stepsPerRev: undefined,
+    },
   },
   stepper: {
     type: "stepper",
@@ -303,5 +331,16 @@ export const MOTOR_TYPES: Record<MotorType, MotorTypeInfo> = {
     cons: ["Torque falls with speed", "Can lose steps", "Draws current even when still"],
     usedIn: "3D printers, small CNC, camera rigs, lab automation",
     color: "#4ade80",
+    defaults: {
+      // a NEMA-17: slow, deliberate, strong when holding still
+      voltage: 24,
+      kv: 30,
+      resistance: 2,
+      noLoadCurrent: 0.1,
+      currentLimit: 1.5,
+      rotorInertia: 54,
+      mass: 350,
+      stepsPerRev: 200,
+    },
   },
 };

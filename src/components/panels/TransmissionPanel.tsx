@@ -40,6 +40,9 @@ export default function TransmissionPanel() {
       <SectionTitle right={<span className="font-mono text-[11px] text-[var(--muted)]">{stages.length} stage{stages.length === 1 ? "" : "s"}</span>}>
         2 · Transmission
       </SectionTitle>
+      <p className="mb-2.5 text-[11px] leading-snug text-[var(--muted)]">
+        The gears. Each stage trades the motor&apos;s speed for strength — stack as many as you need.
+      </p>
 
       {stages.length === 0 && (
         <p className="rounded-lg border border-dashed border-[var(--border)] p-3 text-center text-[11px] text-[var(--muted)]">

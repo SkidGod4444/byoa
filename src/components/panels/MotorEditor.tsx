@@ -16,6 +16,9 @@ export default function MotorEditor() {
   return (
     <div className="panel p-3.5">
       <SectionTitle>1 · Power Source</SectionTitle>
+      <p className="mb-2.5 text-[11px] leading-snug text-[var(--muted)]">
+        The engine. Every actuator starts with raw spin — pick what kind, then shape it below.
+      </p>
 
       <Segmented<MotorType>
         value={motor.type}
@@ -28,6 +31,9 @@ export default function MotorEditor() {
       />
 
       <p className="mt-2.5 text-[11px] leading-snug text-[var(--muted)]">{info.tagline}</p>
+      <p className="mt-1 text-[10px] text-[var(--muted)] opacity-70">
+        Switching loads that motor family&apos;s typical numbers — tweak them freely after.
+      </p>
 
       <div className="mt-3 space-y-3">
         <Field label="Voltage" concept="motor" value={motor.voltage} min={3} max={60} step={0.5} precision={1} unit="V" onChange={(v) => updateMotor({ voltage: v })} />

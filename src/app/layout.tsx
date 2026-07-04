@@ -13,8 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  // TODO: point at the real production domain before deploying.
-  metadataBase: new URL("https://byoa.app"),
+  // Resolved from the deployment itself: set NEXT_PUBLIC_SITE_URL explicitly,
+  // or Vercel's production URL is used; falls back to localhost in dev.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : `http://localhost:${process.env.PORT ?? 3000}`),
+  ),
   title: {
     default: "BYOA — Build Your Own Actuators",
     template: "%s · BYOA",

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { useMemo } from "react";
-import { STAGE_TYPES } from "@/lib/catalog";
+import { MOTOR_TYPES, STAGE_TYPES } from "@/lib/catalog";
 import { computeDrive, stageRatio } from "@/lib/physics";
 import { blankDesign } from "@/lib/presets";
 import type { ActuatorDesign, Motor, MotorType, Stage, StageType } from "@/lib/types";
@@ -58,6 +58,15 @@ interface DesignState {
   setSimSpeed: (n: number) => void;
 }
 
+/**
+ * Editing a loaded example forks it: the design stops claiming to be the
+ * preset (id → "custom") and the name says so. Idempotent for custom designs.
+ */
+function forked(design: ActuatorDesign): ActuatorDesign {
+  if (design.id === "custom") return design;
+  return { ...design, id: "custom", name: `${design.name} (custom)` };
+}
+
 function persist(design: ActuatorDesign) {
   if (typeof window === "undefined") return;
   try {
@@ -101,21 +110,27 @@ export const useDesignStore = create<DesignState>((set, get) => ({
 
   setName: (name) =>
     set((s) => {
-      const design = { ...s.design, name };
+      const design = { ...s.design, name, id: "custom" };
       persist(design);
       return { design };
     }),
 
   updateMotor: (patch) =>
     set((s) => {
-      const design = { ...s.design, motor: { ...s.design.motor, ...patch } };
+      const design = forked({ ...s.design, motor: { ...s.design.motor, ...patch } });
       persist(design);
       return { design };
     }),
 
   setMotorType: (type) =>
     set((s) => {
-      const design = { ...s.design, motor: { ...s.design.motor, type } };
+      // Load the family's typical real-world numbers so switching type
+      // visibly changes the machine — the sliders stay fully editable after.
+      const info = MOTOR_TYPES[type];
+      const design = forked({
+        ...s.design,
+        motor: { ...s.design.motor, ...info.defaults, type, name: info.label },
+      });
       persist(design);
       return { design };
     }),
@@ -123,7 +138,7 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   addStage: (type) =>
     set((s) => {
       const stage: Stage = { id: freshId(), ...STAGE_TYPES[type].makeDefault() };
-      const design = { ...s.design, stages: [...s.design.stages, stage] };
+      const design = forked({ ...s.design, stages: [...s.design.stages, stage] });
       persist(design);
       return { design, selectedStageId: stage.id };
     }),
@@ -137,7 +152,7 @@ export const useDesignStore = create<DesignState>((set, get) => ({
         merged.ratio = stageRatio(merged);
         return merged;
       });
-      const design = { ...s.design, stages };
+      const design = forked({ ...s.design, stages });
       persist(design);
       return { design };
     }),
@@ -145,7 +160,7 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   removeStage: (id) =>
     set((s) => {
       const stages = s.design.stages.filter((st) => st.id !== id);
-      const design = { ...s.design, stages };
+      const design = forked({ ...s.design, stages });
       persist(design);
       return {
         design,
@@ -160,7 +175,7 @@ export const useDesignStore = create<DesignState>((set, get) => ({
       const j = i + dir;
       if (i < 0 || j < 0 || j >= stages.length) return {};
       [stages[i], stages[j]] = [stages[j], stages[i]];
-      const design = { ...s.design, stages };
+      const design = forked({ ...s.design, stages });
       persist(design);
       return { design };
     }),
