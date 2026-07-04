@@ -1,10 +1,11 @@
 "use client";
 
-import { BicepsFlexed, Hand, Zap } from "lucide-react";
+import { useState } from "react";
+import { BicepsFlexed, Hand, Weight, Zap } from "lucide-react";
 import { fmt, ratioLabel } from "@/lib/physics";
 import { useDrive } from "@/store/designStore";
-import type { BackdriveRating } from "@/lib/types";
-import { SectionTitle, Stat } from "@/components/ui/controls";
+import type { BackdriveRating, DriveResult } from "@/lib/types";
+import { Field, SectionTitle, Stat } from "@/components/ui/controls";
 import TorqueSpeedChart from "@/components/viz/TorqueSpeedChart";
 
 const RATING: Record<BackdriveRating, { label: string; tone: "good" | "warn" | "bad"; note: string }> = {
@@ -50,6 +51,86 @@ function PlainTerms() {
   );
 }
 
+/**
+ * Hands-on load test: pick a payload and an arm length, see instantly whether
+ * THIS actuator can hold and move it — and with how much margin.
+ */
+function PayloadCheck({ drive }: { drive: DriveResult }) {
+  const [arm, setArm] = useState(15);
+  const [mass, setMass] = useState(2);
+
+  const linear = drive.isLinear && drive.linear;
+  const needed = linear ? mass * 9.81 : mass * 9.81 * (arm / 100);
+  const capacity = linear ? drive.linear!.stallForce : drive.stallTorque;
+  const util = capacity > 0 ? needed / capacity : Infinity;
+
+  // speed left at this load, from the actual output curve
+  let speedAtLoad = 0;
+  if (linear) {
+    speedAtLoad = Math.max(0, drive.linear!.noLoadSpeed * (1 - util));
+  } else {
+    for (const pt of drive.curve) if (pt.torque >= needed && pt.speed > speedAtLoad) speedAtLoad = pt.speed;
+  }
+  const ok = util <= 1;
+  const comfortable = util <= 0.7;
+  const barPct = Math.min(100, util * 100);
+  const tone = comfortable ? "var(--good)" : ok ? "var(--warn)" : "var(--bad)";
+
+  const verdict = !ok
+    ? `Too weak — needs ${fmt(needed, 1)} ${linear ? "N" : "N·m"} but tops out at ${fmt(capacity, 1)}.`
+    : linear
+      ? `Lifts it at up to ${fmt(speedAtLoad, 0)} mm/s (${fmt(util * 100, 0)}% of max force).`
+      : `Holds it using ${fmt(util * 100, 0)}% of its strength — and can still swing 90° in ${speedAtLoad > 0 ? fmt(15 / speedAtLoad, 2) : "∞"} s.`;
+
+  return (
+    <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-3">
+      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+        <Weight size={11} className="text-[var(--accent)]" />
+        Load test — try it against a real job
+      </div>
+      <div className="mt-2.5 space-y-2.5">
+        <Field label="Payload" value={mass} min={0.2} max={60} step={0.2} precision={1} unit="kg" onChange={setMass} />
+        {!linear && <Field label="Arm length" value={arm} min={5} max={60} step={1} precision={0} unit="cm" onChange={setArm} />}
+      </div>
+      <div className="mt-2.5 h-2 w-full bg-[var(--surface-3)]">
+        <div className="h-full transition-all duration-300" style={{ width: `${barPct}%`, background: tone }} />
+      </div>
+      <p className="mt-1.5 text-[11px] leading-snug" style={{ color: tone }}>
+        {verdict}
+      </p>
+    </div>
+  );
+}
+
+/** Flash how the LAST edit moved the headline numbers — cause and effect. */
+function SpecDeltas({ drive }: { drive: DriveResult }) {
+  const cur = drive.isLinear && drive.linear ? { t: drive.linear.stallForce, s: drive.linear.noLoadSpeed } : { t: drive.stallTorque, s: drive.noLoadSpeed };
+  // "adjust state during render" pattern (react.dev) — remembers the previous
+  // spec snapshot and derives the delta when the design changes.
+  const [state, setState] = useState({ t: cur.t, s: cur.s, dt: 0, ds: 0, rev: 0 });
+  if (Math.abs(state.t - cur.t) > 1e-3 || Math.abs(state.s - cur.s) > 1e-2) {
+    setState({ t: cur.t, s: cur.s, dt: cur.t - state.t, ds: cur.s - state.s, rev: state.rev + 1 });
+    return null;
+  }
+  const { dt, ds, rev } = state;
+
+  if (rev === 0 || (Math.abs(dt) <= 1e-3 && Math.abs(ds) <= 1e-2)) return null;
+  const unitT = drive.isLinear ? "N" : "N·m";
+  const unitS = drive.isLinear ? "mm/s" : "rpm";
+  const cell = (d: number, unit: string) => (
+    <span className={`font-mono text-[10.5px] ${d >= 0 ? "text-[var(--good)]" : "text-[var(--bad)]"}`}>
+      {d >= 0 ? "▲" : "▼"} {fmt(Math.abs(d), Math.abs(d) < 10 ? 2 : 0)} {unit}
+    </span>
+  );
+  return (
+    <div key={rev} className="animate-delta mt-2 flex items-center gap-3 border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-1">
+      <span className="text-[9px] uppercase tracking-wide text-[var(--muted)]">last change</span>
+      {Math.abs(dt) > 1e-3 && cell(dt, unitT)}
+      {Math.abs(ds) > 1e-2 && cell(ds, unitS)}
+    </div>
+  );
+}
+
 export default function SpecsPanel() {
   const drive = useDrive();
   const r = RATING[drive.backdrive];
@@ -61,6 +142,7 @@ export default function SpecsPanel() {
       </SectionTitle>
 
       <PlainTerms />
+      <SpecDeltas drive={drive} />
 
       {/* hero numbers */}
       <div className="mt-2 grid grid-cols-2 gap-2">
@@ -76,6 +158,8 @@ export default function SpecsPanel() {
           </>
         )}
       </div>
+
+      <PayloadCheck drive={drive} />
 
       {/* backdrivability */}
       <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2.5">

@@ -1,8 +1,9 @@
 "use client";
 
-import { BookOpen, RotateCcw } from "lucide-react";
+import { BookOpen, RotateCcw, Trophy } from "lucide-react";
 import { useDesignStore } from "@/store/designStore";
 import { useUiStore } from "@/store/uiStore";
+import { useChallengeStore } from "@/store/challengeStore";
 import { q } from "@/lib/physics";
 import PresetMenu from "./panels/PresetMenu";
 import ShareButton from "./panels/ShareButton";
@@ -12,6 +13,7 @@ export default function Header() {
   const setName = useDesignStore((s) => s.setName);
   const reset = useDesignStore((s) => s.reset);
   const openGlossary = useUiStore((s) => s.openGlossary);
+  const openChallenges = useChallengeStore((s) => s.setPickerOpen);
   const openIntro = useUiStore((s) => s.setIntroOpen);
 
   return (
@@ -54,6 +56,13 @@ export default function Header() {
             className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[var(--muted)] transition hover:text-[var(--text)] sm:flex"
           >
             How it works
+          </button>
+          <button
+            onClick={() => openChallenges(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1.5 text-[12px] font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
+          >
+            <Trophy size={14} strokeWidth={1.8} className="text-[var(--accent)]" />
+            Challenges
           </button>
           <button
             onClick={() => openGlossary()}

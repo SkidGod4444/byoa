@@ -14,6 +14,7 @@ import TransmissionPanel from "./panels/TransmissionPanel";
 import SpecsPanel from "./panels/SpecsPanel";
 import AnatomyCard from "./panels/AnatomyCard";
 import SceneToolbar from "./panels/SceneToolbar";
+import { ActiveChallengeCard, ChallengePicker } from "./panels/ChallengesPanel";
 import ViewControls from "./panels/ViewControls";
 
 // The 3D scene touches WebGL — client-only.
@@ -116,6 +117,7 @@ export default function AppShell() {
         {/* left column — build controls */}
         {leftOpen && (
           <div className="space-y-3 px-3 py-3 lg:absolute lg:bottom-0 lg:left-0 lg:top-0 lg:w-[340px] lg:overflow-y-auto lg:p-3">
+            <ActiveChallengeCard />
             <div data-tour="motor-panel">
               <MotorEditor />
             </div>
@@ -146,6 +148,7 @@ export default function AppShell() {
       <GlossaryDialog />
       <IntroOverlay />
       <TourOverlay />
+      <ChallengePicker />
       <SmallScreenGate />
     </div>
   );

@@ -28,6 +28,12 @@ and watch real engineering numbers respond — in plain language first, datashee
   a square NEMA-17 body, and the black Damiao joint-motor cans that **OpenArm** (Enactic's
   open-source 7-DoF humanoid arm) is built from — shoulder (DM-J8009P, 9:1), elbow (DM-J4340,
   ~40:1) and wrist (DM-J4310, 10:1), with specs matched to the real hardware.
+- **Design challenges** — eight real engineering briefs ("build a cat leg: ≥15 N·m, backdrivable,
+  ratio ≤10:1"), graded live against your design as you build, with hints and a lesson on
+  completion; progress persists.
+- **Load test** — set a payload and arm length and see instantly whether *your* actuator holds it,
+  with what margin, and how fast it can still move; every edit also flashes a delta badge showing
+  exactly what it changed.
 - **Guided tour that drives the app** — the onboarding doesn't tell you what buttons do, it
   *presses them*: it opens the real Examples menu, loads OpenArm's shoulder, X-rays the case,
   clicks the rotor, explodes the machine and opens the gear palette — with a click-through
