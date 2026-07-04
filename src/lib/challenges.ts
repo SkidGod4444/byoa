@@ -22,6 +22,8 @@ export interface Challenge {
   /** What trade-off this teaches. */
   teaches: string;
   hint: string;
+  /** Concrete click-by-click steps naming the exact UI controls. */
+  steps: string[];
   /** Shown on completion. */
   lesson: string;
   requirements: Requirement[];
@@ -36,6 +38,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "Build a rotary actuator with at least 5 N·m of stall torque.",
     teaches: "Gearing multiplies torque",
     hint: "The default motor alone won't get there — add a gear stage, or raise an existing stage's ratio (more driven teeth, bigger sun-to-ring gap…).",
+    steps: [
+      "Below this card, open “2 · Transmission” and click the Planetary Gearset row to unfold it.",
+      "Drag “Planet teeth” to the right — a bigger ring means a bigger ratio, and torque climbs with it.",
+      "Watch the first box above: it flips green the moment you cross 5 N·m.",
+    ],
     lesson:
       "Motors are torque-poor and speed-rich. Nearly every robot joint you'll ever meet exists because a gearbox traded useless speed for useful twist.",
     requirements: [
@@ -57,6 +64,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "Hold a 2 kg bag at the end of a 15 cm arm — and still turn at 60 rpm with no load.",
     teaches: "The torque ↔ speed trade-off",
     hint: `Holding 2 kg at 15 cm needs ${fmt(kg(2, 15), 1)} N·m. Gearing up gets torque but eats speed — find the ratio that clears BOTH bars.`,
+    steps: [
+      "Raise the ratio (planet teeth up, or “Add a gear stage”) until stall torque clears 2.9 N·m.",
+      "Now check the speed box — if it fell under 60 rpm you geared too hard. Back off a little…",
+      "…or make the MOTOR faster instead: raise Voltage or Kv in “1 · Power Source”. Both boxes green = solved.",
+    ],
     lesson:
       "This is the fundamental bargain of every drivetrain: strength and speed pull in opposite directions, and the gear ratio is the knob that trades one for the other.",
     requirements: [
@@ -79,6 +91,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "A leg joint that can kick hard (≥ 15 N·m) yet stays soft to the touch — like the Mini Cheetah's.",
     teaches: "Quasi-direct drive",
     hint: "High ratios kill backdrivability. Keep the TOTAL ratio at 10:1 or less, and get your torque from the motor instead: big current limit, low Kv.",
+    steps: [
+      "Keep the gearing tiny: one planetary stage with a total ratio of 10:1 or less (sun vs planet teeth set it).",
+      "Get your torque from the MOTOR: in “1 · Power Source”, drag Kv down low and “Current limit” up high.",
+      "Check the right panel — Backdrivability must read good or excellent (small ratio keeps it that way).",
+    ],
     lesson:
       "You just reinvented the quasi-direct-drive actuator. A muscular motor with a whisper of gearing feels the ground, survives impacts, and made modern legged robots possible.",
     requirements: [
@@ -105,6 +122,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "A precision joint: at least 20 N·m with under 2 arc-minutes of backlash.",
     teaches: "Precision gearing",
     hint: "Every spur or planetary stage ADDS slop. One zero-backlash stage type gets you a huge ratio with almost none — check the harmonic drive and cycloidal.",
+    steps: [
+      "Every spur/planetary stage adds slop — delete them with the ✕ on each stage row.",
+      "Click “Add a gear stage” and pick Harmonic Drive: ~0.5 arcmin of backlash and a huge ratio in one part.",
+      "Drag its “Reduction ratio” up until stall torque clears 20 N·m.",
+    ],
     lesson:
       "Backlash accumulates stage by stage, which is why precision machines pay for exotic single-stage reducers. This is the exact reason harmonic drives rule robot-arm wrists.",
     requirements: [
@@ -126,6 +148,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "A joint that keeps ≥ 8 N·m of grip even when unplugged — no brakes allowed.",
     teaches: "Self-locking mechanisms",
     hint: "Some stages physically can't be driven backwards — friction acts as a one-way valve. A worm drive (or an inefficient lead screw) self-locks for free.",
+    steps: [
+      "Click “Add a gear stage” → Worm Drive. Its sliding threads act like a one-way valve for motion.",
+      "The right panel should now say Self-locking under Backdrivability.",
+      "Raise “Wheel teeth” (or add a stage before it) until torque reaches 8 N·m.",
+    ],
     lesson:
       "Self-locking is free holding force paid for in efficiency. Winches, lifts and camera mounts all exploit it — and it's why your guitar stays in tune.",
     requirements: [
@@ -148,6 +175,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "A linear actuator that pushes with ≥ 800 N and holds position unpowered.",
     teaches: "Rotary → linear conversion",
     hint: "End the chain with a lead screw. Force = torque ÷ lead (roughly), so a smaller lead OR more gearing upstream multiplies your push.",
+    steps: [
+      "End the chain with “Add a gear stage” → Lead Screw — that converts spin into push.",
+      "Smaller “Lead” = more force per turn. Drag it down and watch Max force jump.",
+      "Still short of 800 N? Add a Planetary Gearset BEFORE the screw to multiply its input torque.",
+    ],
     lesson:
       "A screw is a circular ramp: gentle slope (small lead) = huge force, slow travel — and enough friction to park a load forever. That's a 3D-printer Z-axis and a car jack in one idea.",
     requirements: [
@@ -169,6 +201,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "Spin the output at 2,000+ rpm while keeping at least 0.5 N·m of stall torque.",
     teaches: "When NOT to gear down",
     hint: "Gearing steals speed — use as little as possible (or none) and pick motor numbers that make torque directly: Kv, voltage and current limit are your levers.",
+    steps: [
+      "Delete the gear stages (✕ on each row) — every ratio steals output speed.",
+      "In “1 · Power Source”, push Voltage and Kv up: speed is volts × Kv.",
+      "Torque dipping under 0.5 N·m? Raise “Current limit” — torque per amp is what's left.",
+    ],
     lesson:
       "Not every job wants a gearbox. Fans, spindles and propellers run direct-drive because reduction would throw away exactly the thing they need most.",
     requirements: [
@@ -191,6 +228,11 @@ export const CHALLENGES: Challenge[] = [
     brief: "Reach a 40:1 total ratio while keeping drivetrain efficiency at 85% or better.",
     teaches: "Efficiency compounds",
     hint: "Efficiencies MULTIPLY: two 95% stages keep 90%. A worm gets 40:1 in one go but burns ~40% as heat — stack efficient planetary stages instead.",
+    steps: [
+      "Avoid worms and harmonics here — they burn 20–40% as heat.",
+      "Stack two or three Planetary Gearsets (“Add a gear stage”): 0.95 × 0.95 ≈ 90% survives.",
+      "Multiply their ratios to 40:1 total — check the ratio chip at the top of the right panel.",
+    ],
     lesson:
       "Losses compound silently, which is why battery-powered robots stack a few efficient stages instead of one lossy shortcut. Heat is the tax on lazy gearing.",
     requirements: [

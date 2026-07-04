@@ -22,6 +22,7 @@ import {
   Package,
   Rocket,
   Scan,
+  Trophy,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -30,6 +31,7 @@ import type { ActuatorDesign } from "@/lib/types";
 import { useDesignStore } from "./designStore";
 import { useSceneStore } from "./sceneStore";
 import { useUiStore } from "./uiStore";
+import { useChallengeStore } from "./challengeStore";
 import { partPositions } from "@/components/three/Assemblies";
 import { cameraBus } from "@/components/three/cameraBus";
 
@@ -249,6 +251,19 @@ export const TOUR_STEPS: TourStep[] = [
       const d = el("engineer") as HTMLDetailsElement | null;
       if (d) d.open = false;
     },
+  },
+  {
+    id: "challenges",
+    target: "challenges",
+    extraTarget: "challenges-menu",
+    icon: Trophy,
+    title: "Now prove it",
+    body:
+      "Eight real engineering briefs — build a cat leg, a surgeon's wrist, a power-off holder — graded " +
+      "live while you build, with hints when you're stuck. I just opened the mission board; your first " +
+      "solve is waiting right after this tour.",
+    onEnter: () => later(500, () => realClick("challenges")),
+    onExit: () => useChallengeStore.getState().setPickerOpen(false),
   },
   {
     id: "done",

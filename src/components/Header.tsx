@@ -58,6 +58,7 @@ export default function Header() {
             How it works
           </button>
           <button
+            data-tour="challenges"
             onClick={() => openChallenges(true)}
             className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1.5 text-[12px] font-medium text-[var(--text)] transition hover:border-[var(--accent)]"
           >

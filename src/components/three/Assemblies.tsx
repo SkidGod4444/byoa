@@ -21,7 +21,7 @@ import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { generateGear, generateRingGear } from "@/lib/gearGeometry";
 import { PART_INFO } from "@/lib/anatomy";
-import { STAGE_TYPES } from "@/lib/catalog";
+import { MOTOR_TYPES, STAGE_TYPES } from "@/lib/catalog";
 import type { CoverStyle, Stage } from "@/lib/types";
 import { useDesignStore } from "@/store/designStore";
 import { useSceneStore } from "@/store/sceneStore";
@@ -373,8 +373,11 @@ function MotorAssembly({
 }) {
   const rotorRef = useRef<THREE.Group>(null);
   const encoderRef = useRef<THREE.Group>(null);
+  const motorType = useDesignStore((s) => s.design.motor.type);
   useFrame(() => {
-    const r = clockRef.current * DEG;
+    // A stepper doesn't flow — it TICKS. Quantize its spin to visible steps.
+    const raw = motorType === "stepper" ? Math.floor(clockRef.current / 9) * 9 : clockRef.current;
+    const r = raw * DEG;
     if (rotorRef.current) rotorRef.current.rotation.z = r;
     if (encoderRef.current) encoderRef.current.rotation.z = r;
   });
@@ -411,41 +414,109 @@ function MotorAssembly({
         </SelectablePart>
       )}
 
-      {/* stator: band + 12 teeth with copper windings */}
+      {/* stator — its construction is what makes each motor family different */}
       <SelectablePart pk="motor/stator" labelR={MOTOR_R + 3}>
         <group position={[0, e * 12, -17]}>
-          <mesh geometry={torusGeo(12.8, 1.7)}>
-            <Mat color={STEEL_DARK} />
-          </mesh>
-          {Array.from({ length: 12 }, (_, k) => {
-            const ang = (k / 12) * Math.PI * 2;
-            const x = Math.cos(ang) * 10.7;
-            const y = Math.sin(ang) * 10.7;
-            return (
-              <group key={k} position={[x, y, 0]} rotation={[0, 0, ang]}>
-                <mesh geometry={boxGeo(4.4, 2.6, 19)}>
-                  <Mat color={STEEL_DARK} />
-                </mesh>
-                <mesh geometry={boxGeo(2.9, 4.6, 16)}>
-                  <Mat color={COPPER} metalness={0.85} roughness={0.3} />
-                </mesh>
-              </group>
-            );
-          })}
+          {motorType === "brushed-dc" ? (
+            <group>
+              {/* brushed: permanent magnets live on the STATOR… */}
+              <mesh geometry={arcShellGeo(11.8, 24, 0.35, Math.PI - 0.7)}>
+                <Mat color={MAG_N} metalness={0.5} roughness={0.45} side={THREE.DoubleSide} />
+              </mesh>
+              <mesh geometry={arcShellGeo(11.8, 24, Math.PI + 0.35, Math.PI - 0.7)}>
+                <Mat color={MAG_S} metalness={0.5} roughness={0.45} side={THREE.DoubleSide} />
+              </mesh>
+              {/* …and carbon brushes press on the commutator at the back */}
+              <mesh geometry={boxGeo(3.6, 2.4, 4.2)} position={[6.6, 0, -10.5]}>
+                <Mat color="#2b2b30" metalness={0.2} roughness={0.7} />
+              </mesh>
+              <mesh geometry={boxGeo(3.6, 2.4, 4.2)} position={[-6.6, 0, -10.5]}>
+                <Mat color="#2b2b30" metalness={0.2} roughness={0.7} />
+              </mesh>
+            </group>
+          ) : motorType === "stepper" ? (
+            <group>
+              {/* stepper: eight chunky wound poles */}
+              <mesh geometry={torusGeo(13, 1.9)}>
+                <Mat color={STEEL_DARK} />
+              </mesh>
+              {Array.from({ length: 8 }, (_, k) => {
+                const ang = (k / 8) * Math.PI * 2;
+                return (
+                  <group key={k} position={[Math.cos(ang) * 10.4, Math.sin(ang) * 10.4, 0]} rotation={[0, 0, ang]}>
+                    <mesh geometry={boxGeo(5, 3.6, 19)}>
+                      <Mat color={STEEL_DARK} />
+                    </mesh>
+                    <mesh geometry={boxGeo(3.4, 6, 15)}>
+                      <Mat color={COPPER} metalness={0.85} roughness={0.3} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
+          ) : (
+            <group>
+              {/* BLDC: a dense ring of 12 slim wound slots */}
+              <mesh geometry={torusGeo(12.8, 1.7)}>
+                <Mat color={STEEL_DARK} />
+              </mesh>
+              {Array.from({ length: 12 }, (_, k) => {
+                const ang = (k / 12) * Math.PI * 2;
+                return (
+                  <group key={k} position={[Math.cos(ang) * 10.7, Math.sin(ang) * 10.7, 0]} rotation={[0, 0, ang]}>
+                    <mesh geometry={boxGeo(4.4, 2.6, 19)}>
+                      <Mat color={STEEL_DARK} />
+                    </mesh>
+                    <mesh geometry={boxGeo(2.9, 4.6, 16)}>
+                      <Mat color={COPPER} metalness={0.85} roughness={0.3} />
+                    </mesh>
+                  </group>
+                );
+              })}
+            </group>
+          )}
         </group>
       </SelectablePart>
 
-      {/* rotor: core + 8 magnet shells (spins) */}
+      {/* rotor (spins) — magnets, windings, or a toothed iron core per family */}
       <SelectablePart pk="motor/rotor" labelR={11}>
         <group ref={rotorRef} position={[0, -e * 14, -17]}>
-          <mesh geometry={zCylinderGeo(7.6, 7.6, 24, 32)}>
-            <Mat color={STEEL} metalness={0.8} roughness={0.28} />
-          </mesh>
-          {Array.from({ length: 8 }, (_, k) => (
-            <mesh key={k} geometry={arcShellGeo(8.7, 22, (k * Math.PI) / 4 + 0.03, Math.PI / 4 - 0.06)}>
-              <Mat color={k % 2 ? MAG_S : MAG_N} metalness={0.5} roughness={0.45} side={THREE.DoubleSide} />
+          {motorType === "brushed-dc" ? (
+            <group>
+              {/* wound armature spinning inside stationary magnets */}
+              <mesh geometry={zCylinderGeo(7.8, 7.8, 20, 24)}>
+                <Mat color={STEEL} metalness={0.7} roughness={0.3} />
+              </mesh>
+              {Array.from({ length: 6 }, (_, k) => {
+                const ang = (k / 6) * Math.PI * 2;
+                return (
+                  <mesh key={k} geometry={boxGeo(3.2, 4.4, 17)} position={[Math.cos(ang) * 6.2, Math.sin(ang) * 6.2, 0]} rotation={[0, 0, ang]}>
+                    <Mat color={COPPER} metalness={0.85} roughness={0.3} />
+                  </mesh>
+                );
+              })}
+              {/* copper commutator the brushes ride on */}
+              <mesh geometry={zCylinderGeo(4.6, 4.6, 5, 18)} position={[0, 0, -12.5]}>
+                <Mat color={COPPER} metalness={0.9} roughness={0.22} />
+              </mesh>
+            </group>
+          ) : motorType === "stepper" ? (
+            /* toothed hybrid rotor — the teeth ARE the steps */
+            <mesh geometry={spurGearGeo(48, 0.3, 21, 3)}>
+              <Mat color={STEEL} metalness={0.8} roughness={0.28} />
             </mesh>
-          ))}
+          ) : (
+            <group>
+              <mesh geometry={zCylinderGeo(7.6, 7.6, 24, 32)}>
+                <Mat color={STEEL} metalness={0.8} roughness={0.28} />
+              </mesh>
+              {Array.from({ length: 8 }, (_, k) => (
+                <mesh key={k} geometry={arcShellGeo(8.7, 22, (k * Math.PI) / 4 + 0.03, Math.PI / 4 - 0.06)}>
+                  <Mat color={k % 2 ? MAG_S : MAG_N} metalness={0.5} roughness={0.45} side={THREE.DoubleSide} />
+                </mesh>
+              ))}
+            </group>
+          )}
         </group>
       </SelectablePart>
 
@@ -494,6 +565,9 @@ function MotorAssembly({
               </mesh>
             );
           })}
+          <mesh geometry={torusGeo(MOTOR_R - 1.4, 0.65)} position={[0, 0, 1.7]}>
+            <Mat color={MOTOR_TYPES[motorType].color} metalness={0.5} roughness={0.4} />
+          </mesh>
         </group>
       </SelectablePart>
     </group>

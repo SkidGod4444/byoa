@@ -52,6 +52,10 @@ export function ActiveChallengeCard() {
 
       <h3 className="mt-1.5 text-[14px] font-bold text-[var(--text)]">{challenge.title}</h3>
       <p className="mt-1 text-[12px] leading-snug text-[var(--muted)]">{challenge.brief}</p>
+      <p className="mt-1.5 border-l-2 border-[var(--border-strong)] pl-2 text-[10.5px] leading-snug text-[var(--muted)]">
+        How it works: build with the panels below — every change re-grades the boxes underneath instantly.
+        Turn them all green and you&apos;ve solved it.
+      </p>
 
       {/* live requirement grading */}
       <div className="mt-2.5 space-y-1.5">
@@ -96,9 +100,23 @@ export function ActiveChallengeCard() {
             className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--warn)] transition hover:brightness-110"
           >
             <Lightbulb size={12} />
-            {showHint ? "Hide hint" : "Need a hint?"}
+            {showHint ? "Hide the walkthrough" : "Show me how, step by step"}
           </button>
-          {showHint && <p className="mt-1.5 border border-[var(--warn)]/30 bg-[var(--warn)]/8 p-2 text-[11px] leading-snug text-[var(--text)] animate-fade-up">{challenge.hint}</p>}
+          {showHint && (
+            <div className="mt-1.5 space-y-1.5 border border-[var(--warn)]/30 bg-[var(--warn)]/8 p-2.5 animate-fade-up">
+              <p className="text-[11px] leading-snug text-[var(--text)]">{challenge.hint}</p>
+              <ol className="space-y-1">
+                {challenge.steps.map((st, i) => (
+                  <li key={i} className="flex gap-2 text-[11px] leading-snug text-[var(--text)]">
+                    <span className="grid h-4 w-4 shrink-0 place-items-center bg-[var(--warn)]/20 font-mono text-[9px] font-bold text-[var(--warn)]">
+                      {i + 1}
+                    </span>
+                    {st}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -126,7 +144,7 @@ export function ChallengePicker() {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-4 sm:p-10" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-      <div className="relative flex max-h-[84vh] w-full max-w-2xl flex-col overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-2xl animate-fade-up">
+      <div data-tour="challenges-menu" className="relative flex max-h-[84vh] w-full max-w-2xl flex-col overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-2xl animate-fade-up">
         <div className="h-0.5 w-full bg-[var(--accent)]" />
         <div className="flex items-center gap-3 border-b border-[var(--border)] p-4">
           <Trophy size={16} className="text-[var(--accent)]" />
