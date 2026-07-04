@@ -116,7 +116,7 @@ function designSummary(design: ActuatorDesign): string {
 
 export function buildAiPrompt(design: ActuatorDesign, partKey: string | null): string {
   const summary = designSummary(design);
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://byoa.app";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://buildyourownactuator.vercel.app";
 
   let focus = "the whole actuator";
   let partBlock = "";

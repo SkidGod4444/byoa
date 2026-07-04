@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ??
       (process.env.VERCEL_PROJECT_PRODUCTION_URL
         ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-        : `http://localhost:${process.env.PORT ?? 3000}`),
+        : "https://buildyourownactuator.vercel.app"),
   ),
   title: {
     default: "BYOA — Build Your Own Actuators",

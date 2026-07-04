@@ -1,5 +1,7 @@
 # BYOA — Build Your Own Actuators
 
+**Live: [buildyourownactuator.vercel.app](https://buildyourownactuator.vercel.app)**
+
 An interactive **3D playground for learning how robot actuators work**. Assemble a motor and a
 transmission, click any part to learn its anatomy, pull the machine apart with an explode slider,
 and watch real engineering numbers respond — in plain language first, datasheet language second.
@@ -38,7 +40,9 @@ and watch real engineering numbers respond — in plain language first, datashee
   `/ai/context.md` — the app's entire knowledge base as one markdown file for AIs to read.
 - **Small-screen friendly** — zoom / pan / re-frame buttons on the canvas and collapsible side
   panels for a full-bleed 3D view.
-- **Share** — designs persist locally and encode into a shareable URL.
+- **Share** — designs persist locally and encode into a ~100-character URL (compact codec, no
+  shortener backend needed); shared links get their own OG card showing the actuator as a
+  50%-exploded schematic with its computed specs.
 
 ## Run it
 

@@ -19,19 +19,9 @@ function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v));
 }
 
-// --- share/persistence codec ------------------------------------------------
-export function encodeDesign(d: ActuatorDesign): string {
-  return btoa(encodeURIComponent(JSON.stringify(d)));
-}
-export function decodeDesign(s: string): ActuatorDesign | null {
-  try {
-    const d = JSON.parse(decodeURIComponent(atob(s)));
-    if (d && d.motor && Array.isArray(d.stages)) return d as ActuatorDesign;
-    return null;
-  } catch {
-    return null;
-  }
-}
+// --- share/persistence codec (compact v2 lives in lib/shareCodec) ------------
+export { encodeDesign, decodeDesign } from "@/lib/shareCodec";
+import { decodeDesign } from "@/lib/shareCodec";
 
 interface DesignState {
   design: ActuatorDesign;
