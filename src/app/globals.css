@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root {
+  /* BYOA — shadcn-style zinc dark preset, orange primary, sharp corners */
+  --bg: #09090b; /* zinc-950 */
+  --surface: #121214; /* card */
+  --surface-2: #0c0c0e;
+  --surface-3: #1c1c1f;
+  --border: #232326; /* ~zinc-800 */
+  --border-strong: #3f3f46; /* zinc-700 */
+  --text: #fafafa; /* zinc-50 */
+  --muted: #9f9fa8; /* ~zinc-400 */
+  --accent: #f97316; /* orange-500 */
+  --accent-soft: rgba(249, 115, 22, 0.13);
+  --power: #8b5cf6; /* violet-500 — chart power line */
+  --good: #10b981;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* sharp corners everywhere — zero the radius scale */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+}
+
+html {
+  color-scheme: dark;
+}
+
+/* Tailwind v4's preflight leaves buttons with the default cursor —
+   every interactive control here should invite the click. */
+button:not(:disabled),
+[role="button"],
+summary,
+select,
+label:has(> input[type="range"]) {
+  cursor: pointer;
+}
+
+body {
+  background:
+    radial-gradient(1100px 600px at 12% -10%, rgba(249, 115, 22, 0.05), transparent 60%),
+    radial-gradient(900px 550px at 100% 0%, rgba(139, 92, 246, 0.04), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* thin, dark scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+
+/* range input styling — square, technical */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--surface-3);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  width: 8px;
+  background: var(--accent);
+  border: 1px solid var(--bg);
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 8px;
+  border: 1px solid var(--bg);
+  border-radius: 0;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.35s ease both;
+}
