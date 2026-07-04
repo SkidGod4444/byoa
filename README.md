@@ -28,6 +28,15 @@ and watch real engineering numbers respond — in plain language first, datashee
   a square NEMA-17 body, and the black Damiao joint-motor cans that **OpenArm** (Enactic's
   open-source 7-DoF humanoid arm) is built from — shoulder (DM-J8009P, 9:1), elbow (DM-J4340,
   ~40:1) and wrist (DM-J4310, 10:1), with specs matched to the real hardware.
+- **Academy** — a 13-lesson guided course across 4 modules (Basics → Gearing → Feel & Control →
+  Real Design). Each lesson teaches in plain words, then hands you something to DO in the real app
+  (load an example, run a challenge, open the Lab); progress persists.
+- **Motion Lab** — swing a loaded joint to a target angle and watch it move on an animated arm +
+  angle-vs-time plot: settling time, overshoot, peak speed, and a reflected-vs-payload inertia
+  breakdown that shows *why* high ratios feel sluggish. Integrates the real torque–speed curve,
+  gravity, and reflected inertia.
+- **Stress test** — push a design until it fails: hold-margin safety factor, peak-vs-continuous
+  thermal duty, stepper step-loss risk, and backlash → tip position error in mm.
 - **Design challenges** — eight real engineering briefs ("build a cat leg: ≥15 N·m, backdrivable,
   ratio ≤10:1"), graded live against your design as you build, with hints and a lesson on
   completion; progress persists.

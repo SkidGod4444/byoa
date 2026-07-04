@@ -1,9 +1,10 @@
 "use client";
 
-import { BookOpen, RotateCcw, Trophy } from "lucide-react";
+import { BookOpen, GraduationCap, RotateCcw, Trophy } from "lucide-react";
 import { useDesignStore } from "@/store/designStore";
 import { useUiStore } from "@/store/uiStore";
 import { useChallengeStore } from "@/store/challengeStore";
+import { useAcademyStore } from "@/store/academyStore";
 import { q } from "@/lib/physics";
 import PresetMenu from "./panels/PresetMenu";
 import ShareButton from "./panels/ShareButton";
@@ -14,6 +15,7 @@ export default function Header() {
   const reset = useDesignStore((s) => s.reset);
   const openGlossary = useUiStore((s) => s.openGlossary);
   const openChallenges = useChallengeStore((s) => s.setPickerOpen);
+  const openAcademy = useAcademyStore((s) => s.openAcademy);
   const openIntro = useUiStore((s) => s.setIntroOpen);
 
   return (
@@ -53,9 +55,17 @@ export default function Header() {
         <div className="order-2 ml-auto flex items-center gap-2 sm:order-3">
           <button
             onClick={() => openIntro(true)}
-            className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[var(--muted)] transition hover:text-[var(--text)] sm:flex"
+            className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[var(--muted)] transition hover:text-[var(--text)] lg:flex"
           >
             How it works
+          </button>
+          <button
+            data-tour="academy"
+            onClick={openAcademy}
+            className="flex items-center gap-1.5 rounded-lg border border-[var(--accent)]/50 bg-[var(--accent-soft)] px-3 py-1.5 text-[12px] font-semibold text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
+          >
+            <GraduationCap size={14} strokeWidth={2} />
+            Academy
           </button>
           <button
             data-tour="challenges"

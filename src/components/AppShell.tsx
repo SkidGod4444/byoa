@@ -16,6 +16,7 @@ import AnatomyCard from "./panels/AnatomyCard";
 import SceneToolbar from "./panels/SceneToolbar";
 import { ActiveChallengeCard, ChallengePicker } from "./panels/ChallengesPanel";
 import LabModal from "./LabModal";
+import Academy from "./Academy";
 import ViewControls from "./panels/ViewControls";
 
 // The 3D scene touches WebGL — client-only.
@@ -151,6 +152,7 @@ export default function AppShell() {
       <TourOverlay />
       <ChallengePicker />
       <LabModal />
+      <Academy />
       <SmallScreenGate />
     </div>
   );

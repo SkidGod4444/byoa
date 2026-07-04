@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { Play } from "lucide-react";
+import { GraduationCap, Play } from "lucide-react";
 import { useUiStore } from "@/store/uiStore";
 import { useTourStore } from "@/store/tourStore";
+import { useAcademyStore } from "@/store/academyStore";
 
 const STEPS = [
   {
@@ -89,12 +90,22 @@ export default function IntroOverlay() {
           <button
             onClick={() => {
               setOpen(false);
+              useAcademyStore.getState().openAcademy();
+            }}
+            className="hidden items-center gap-2 border border-[var(--accent)]/50 bg-[var(--accent-soft)] px-4 py-2 text-[13px] font-semibold text-[var(--accent)] transition hover:bg-[var(--accent)]/20 sm:flex"
+          >
+            <GraduationCap size={14} strokeWidth={2} />
+            Start the course
+          </button>
+          <button
+            onClick={() => {
+              setOpen(false);
               useTourStore.getState().start();
             }}
             className="flex items-center gap-2 bg-[var(--accent)] px-4 py-2 text-[13px] font-semibold text-[var(--bg)] transition hover:brightness-110"
           >
             <Play size={13} strokeWidth={2.2} />
-            Take the 60-second tour
+            60-second tour
           </button>
         </div>
       </div>
