@@ -15,6 +15,7 @@ import SpecsPanel from "./panels/SpecsPanel";
 import AnatomyCard from "./panels/AnatomyCard";
 import SceneToolbar from "./panels/SceneToolbar";
 import { ActiveChallengeCard, ChallengePicker } from "./panels/ChallengesPanel";
+import LabModal from "./LabModal";
 import ViewControls from "./panels/ViewControls";
 
 // The 3D scene touches WebGL — client-only.
@@ -149,6 +150,7 @@ export default function AppShell() {
       <IntroOverlay />
       <TourOverlay />
       <ChallengePicker />
+      <LabModal />
       <SmallScreenGate />
     </div>
   );

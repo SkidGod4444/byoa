@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { BicepsFlexed, Hand, Weight, Zap } from "lucide-react";
+import { BicepsFlexed, Gauge, Hand, Play, Weight, Zap } from "lucide-react";
 import { fmt, ratioLabel } from "@/lib/physics";
 import { useDrive } from "@/store/designStore";
+import { useLabStore } from "@/store/labStore";
 import type { BackdriveRating, DriveResult } from "@/lib/types";
 import { Field, SectionTitle, Stat } from "@/components/ui/controls";
 import TorqueSpeedChart from "@/components/viz/TorqueSpeedChart";
@@ -131,6 +132,26 @@ function SpecDeltas({ drive }: { drive: DriveResult }) {
   );
 }
 
+function LabButtons() {
+  const openLab = useLabStore((s) => s.openLab);
+  return (
+    <div className="mt-2 grid grid-cols-2 gap-2" data-tour="lab">
+      <button
+        onClick={() => openLab("motion")}
+        className="flex items-center justify-center gap-1.5 border border-[var(--border)] bg-[var(--surface-2)] py-2 text-[12px] font-medium text-[var(--text)] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
+      >
+        <Play size={13} /> Watch it move
+      </button>
+      <button
+        onClick={() => openLab("stress")}
+        className="flex items-center justify-center gap-1.5 border border-[var(--border)] bg-[var(--surface-2)] py-2 text-[12px] font-medium text-[var(--text)] transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
+      >
+        <Gauge size={13} /> Stress test
+      </button>
+    </div>
+  );
+}
+
 export default function SpecsPanel() {
   const drive = useDrive();
   const r = RATING[drive.backdrive];
@@ -174,6 +195,9 @@ export default function SpecsPanel() {
           </span>
         </div>
       </div>
+
+      {/* test lab entry points */}
+      <LabButtons />
 
       {/* engineer detail */}
       <details data-tour="engineer" className="group mt-2">
